@@ -1,0 +1,68 @@
+{
+  "name": "CT_Dose_3D_DiT_FINAL_FULL",
+  "phase": "train",
+  "gpu_ids": [0],
+
+  "path": {
+    "log": "experiments/CT_Dose_3D_DiT_FINAL/logs",
+    "tb_logger": "experiments/CT_Dose_3D_DiT_FINAL/tb_logger",
+    "results": "experiments/CT_Dose_3D_DiT_FINAL/results",
+    "checkpoint": "experiments/CT_Dose_3D_DiT_FINAL/checkpoints",
+    "resume_state": null
+  },
+
+  "datasets": {
+    "train": {
+      "name": "CT_Dose_Dataset_3D_Lazy",
+      "mode": "CT_Dose_3D_Lazy",
+      "dataroot": "data/CT_Dose_Dataset/train/index.csv",
+      "patch_size": 32,
+      "input_size": 16,
+      "batch_size": 16,       
+      "num_workers": 2,      
+      "use_shuffle": true,
+      "subset_fraction": 1.0 
+    },
+    "val": {
+      "name": "CT_Dose_Dataset_3D_Lazy",
+      "mode": "CT_Dose_3D_Lazy",
+      "dataroot": "data/CT_Dose_Dataset/val/index.csv",
+      "patch_size": 32,
+      "input_size": 16,
+      "batch_size": 1,
+      "num_workers": 1,      
+      "subset_fraction": 0.05 
+    }
+  },
+
+  "model": {
+    "which_model_G": "dit_3d",
+    "dit": {
+      "patch_size": 4, 
+      "hidden_size": 384,
+      "depth": 6,
+      "num_heads": 6,
+      "mlp_ratio": 4.0
+    },
+    "beta_schedule": {
+      "train": { "schedule": "linear", "n_timestep": 1000, "linear_start": 1e-4, "linear_end": 2e-2 },
+      "val":   { "schedule": "linear", "n_timestep": 1000, "linear_start": 1e-4, "linear_end": 2e-2 }
+    },
+    "diffusion": { "image_size": 32, "channels": 1, "conditional": true }
+  },
+
+  "train": {
+    "n_iter": 100000, 
+    "val_freq": 2000, 
+    "save_checkpoint_freq": 2000,
+    "print_freq": 100,
+    "optimizer": { 
+        "type": "adamw", 
+        "lr": 2e-4, 
+        "weight_decay": 0.0 
+    },
+    "lr_scheduler": { "type": "cosine_annealing", "eta_min": 1e-6 },
+    "loss_type": "l2",
+    "lambda_img": 0.0, "use_ssim": false, "lambda_lpips": 0.0
+  }
+}

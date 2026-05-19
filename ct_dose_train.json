@@ -1,0 +1,62 @@
+{
+  "name": "CT_Dose_46_53_GlobalNorm",
+  "phase": "train",
+  "gpu_ids": [0],
+
+  "path": {
+    "log": "experiments/CT_Dose_46_53_GlobalNorm/logs",
+    "tb_logger": "experiments/CT_Dose_46_53_GlobalNorm/tb_logger",
+    "results": "experiments/CT_Dose_46_53_GlobalNorm/results",
+    "checkpoint": "experiments/CT_Dose_46_53_GlobalNorm/checkpoints",
+    "resume_state": null
+  },
+
+  "datasets": {
+    "train": {
+      "name": "CT_Dose_Dataset_InMemory",
+      "mode": "InMemory",
+      "dataroot": "data/CT_Dose_Dataset_InMemory/train_set.pt",
+      "batch_size": 16,
+      "num_workers": 4,
+      "use_shuffle": true
+    },
+    "val": {
+      "name": "CT_Dose_Dataset_InMemory",
+      "mode": "InMemory",
+      "dataroot": "data/CT_Dose_Dataset_InMemory/val_set.pt",
+      "num_workers": 4
+    }
+  },
+
+  "model": {
+    "which_model_G": "sr3",
+    "unet": {
+      "in_channel": 3,
+      "out_channel": 1,
+      "inner_channel": 64,
+      "channel_multiplier": [1, 2, 4, 8],
+      "attn_res": [16],
+      "res_blocks": 2,
+      "dropout": 0.2
+    },
+    "beta_schedule": {
+      "train": { "schedule": "linear", "n_timestep": 2000, "linear_start": 1e-6, "linear_end": 1e-2 },
+      "val":   { "schedule": "linear", "n_timestep": 2000, "linear_start": 1e-6, "linear_end": 1e-2 }
+    },
+    "diffusion": { "image_size": 128, "channels": 1, "conditional": true }
+  },
+
+  "train": {
+    "n_iter": 100000,
+    "val_freq": 1000,
+    "save_checkpoint_freq": 5000,
+    "print_freq": 100,
+    "optimizer": { "type": "adamw", "lr": 2e-5, "weight_decay": 1e-4 },
+    "lr_scheduler": { "type": "cosine_annealing", "eta_min": 1e-6 },
+    
+    "loss_type": "l1",
+    "lambda_img": 0.0,
+    "use_ssim": false,
+    "lambda_lpips": 0.0
+  }
+}

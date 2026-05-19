@@ -1,0 +1,60 @@
+{
+  "name": "CT_Dose_3D_UNet_Fast_L2_Residual",
+  "phase": "train",
+  "gpu_ids": [0],
+
+  "path": {
+    "log": "experiments/CT_Dose_3D_UNet_Fast/logs",
+    "tb_logger": "experiments/CT_Dose_3D_UNet_Fast/tb_logger",
+    "results": "experiments/CT_Dose_3D_UNet_Fast/results",
+    "checkpoint": "experiments/CT_Dose_3D_UNet_Fast/checkpoints",
+    "resume_state": null
+  },
+
+  "datasets": {
+    "train": {
+      "name": "CT_Dose_Dataset_3D_Lazy",
+      "mode": "CT_Dose_3D_Lazy",
+      "dataroot": "data/CT_Dose_Dataset/train/index.csv",
+      "patch_size": 32,
+      "input_size": 16,
+      "batch_size": 4,       
+      "num_workers": 4,      
+      "use_shuffle": true,
+      "subset_fraction": 1.0 
+    },
+    "val": {
+      "name": "CT_Dose_Dataset_3D_Lazy",
+      "mode": "CT_Dose_3D_Lazy",
+      "dataroot": "data/CT_Dose_Dataset/val/index.csv",
+      "patch_size": 32,
+      "input_size": 16,
+      "batch_size": 1,
+      "num_workers": 1,      
+      "subset_fraction": 0.2
+    }
+  },
+
+  "model": {
+    "which_model_G": "unet_3d",
+    "diffusion": { "image_size": 32, "channels": 1, "conditional": true },
+    "beta_schedule": {
+      "train": { "schedule": "linear", "n_timestep": 1000, "linear_start": 1e-4, "linear_end": 2e-2 },
+      "val":   { "schedule": "linear", "n_timestep": 1000, "linear_start": 1e-4, "linear_end": 2e-2 }
+    }
+  },
+
+  "train": {
+    "n_iter": 50000, 
+    "val_freq": 1000, 
+    "save_checkpoint_freq": 2000,
+    "print_freq": 100,
+    "optimizer": { 
+        "type": "adamw", 
+        "lr": 5e-5, 
+        "weight_decay": 0.0 
+    },
+    "lr_scheduler": { "type": "cosine_annealing", "eta_min": 1e-6 },
+    "loss_type": "l2"
+  }
+}
